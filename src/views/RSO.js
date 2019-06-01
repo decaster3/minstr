@@ -1,18 +1,18 @@
-import React, {useState, useReducer} from "react"
-import {Bar, Line} from "react-chartjs-2"
+import {CustomTooltips} from "@coreui/coreui-plugin-chartjs-custom-tooltips"
+import {getStyle, hexToRgba} from "@coreui/coreui/dist/js/coreui-utilities"
+import dayjs from "dayjs"
+import React, {useReducer} from "react"
+import {Line} from "react-chartjs-2"
 import {
-  Col,
-  Row,
   Card,
+  CardBody,
+  CardHeader,
+  Col,
+  FormGroup,
   Input,
   Label,
-  FormGroup,
-  CardHeader,
-  CardBody
+  Row
 } from "reactstrap"
-import {getStyle, hexToRgba} from "@coreui/coreui/dist/js/coreui-utilities"
-import {CustomTooltips} from "@coreui/coreui-plugin-chartjs-custom-tooltips"
-import dayjs from "dayjs"
 
 const brandPrimary = getStyle("--primary")
 const brandSuccess = getStyle("--success")
@@ -20,18 +20,52 @@ const brandInfo = getStyle("--info")
 const brandWarning = getStyle("--warning")
 const brandDanger = getStyle("--danger")
 
-// Random Numbers
+/**
+ * @param {number} min
+ * @param {number} max
+ */
 const random = (min, max) => Math.floor(Math.random() * (max - min + 1) + min)
 
+/**
+ * Generates an array of smoothly random values
+ *
+ * @see https://gist.github.com/kevinlynx/68db41b95046b89259c5
+ *
+ * @param {number} delta inc/dec value to avg
+ * @param {number} cnt
+ * @param {number} avg
+ * @param {number} drop smaller/bigger value around avg
+ * @param {number} nProb odds to generate noise value
+ * @param {number} nMin
+ * @param {number} nMax
+ * @return {number[]}
+ */
+const generate = (delta, cnt, avg, drop, nProb, nMin, nMax) => {
+  const createVal = () => {
+    if (Math.random() > nProb) {
+      return Math.floor(Math.random() * (nMax - nMin) + nMin)
+    }
+    return Math.floor(
+      Math.random() * drop * (Math.random() > 0.5 ? -1 : 1) + avg
+    )
+  }
+  const rets = []
+  for (var i = 0; i < cnt; ++i) {
+    rets.push(createVal())
+    avg += delta
+  }
+  return rets
+}
+
 const length = 30
-const data = []
+const data = generate(1, length, 50, 10, 0.9, 0, 100)
 const labels = []
 
 const startDate = dayjs().startOf("year")
 
 for (let i = 0; i < length; i++) {
-  data.push(random(50, 200))
-  labels.push(startDate.add(i, "days").format("MMM DD"))
+  // data.push(random(50, 200))
+  labels.push(startDate.add(i, "day").format("MMM DD"))
 }
 
 const mainChart = {
@@ -48,6 +82,9 @@ const mainChart = {
   ]
 }
 
+/**
+ * @type {Chart.ChartOptions}
+ */
 const mainChartOpts = {
   tooltips: {
     enabled: false,
@@ -56,6 +93,7 @@ const mainChartOpts = {
     mode: "index",
     position: "nearest",
     callbacks: {
+      // @ts-ignore
       labelColor: function(tooltipItem, chart) {
         return {
           backgroundColor:
@@ -81,8 +119,8 @@ const mainChartOpts = {
         ticks: {
           beginAtZero: true,
           maxTicksLimit: 5,
-          stepSize: Math.ceil(250 / 5),
-          max: 250
+          stepSize: Math.ceil(100 / 5),
+          max: 100
         }
       }
     ]
