@@ -116,6 +116,23 @@ const mainChart = {
 }
 
 /**
+ * @return {Chart.ChartData} data
+ */
+const mainChartWithData = data => ({
+  labels,
+  datasets: [
+    {
+      label: "My First dataset",
+      backgroundColor: hexToRgba(brandInfo, 10),
+      borderColor: brandInfo,
+      pointHoverBackgroundColor: "#fff",
+      borderWidth: 2,
+      data
+    }
+  ]
+})
+
+/**
  * @type {Chart.ChartOptions}
  */
 const mainChartOpts = {
@@ -152,8 +169,8 @@ const mainChartOpts = {
         ticks: {
           beginAtZero: true,
           maxTicksLimit: 5,
-          stepSize: Math.ceil(100 / 5),
-          max: 100
+          stepSize: Math.ceil(100 / 5)
+          // max: 100
         }
       }
     ]
@@ -168,6 +185,68 @@ const mainChartOpts = {
   }
 }
 
+const zipSum = R.unapply(
+  R.converge(
+    // @ts-ignore
+    R.reduce(R.zipWith(R.add)),
+    [R.head, R.tail]
+  )
+)
+
+const sumApartmentsData = apartments => {
+  const apartmentDatas = apartments.map(x => x.data)
+  return zipSum(...apartmentDatas)
+}
+
+const sumBuildingsData = buildings => {
+  const buildingDatas = buildings.map(x => sumApartmentsData(x.apartments))
+  return zipSum(...buildingDatas)
+}
+
+const sumStreetsData = streets => {
+  const streetDatas = streets.map(x => sumBuildingsData(x.buildings))
+  return zipSum(...streetDatas)
+}
+
+const sumDistrictsData = districts => {
+  const districtDatas = districts.map(x => sumStreetsData(x.streets))
+  return zipSum(...districtDatas)
+}
+
+const sumStreetsDataOfDistrict = districtName =>
+  sumStreetsData(smartCity.districts.find(x => x.name === districtName).streets)
+
+const sumBuildingsDataOfStreetOfDistrict = (streetName, districtName) =>
+  sumBuildingsData(
+    smartCity.districts
+      .find(x => x.name === districtName)
+      .streets.find(x => x.name === streetName).buildings
+  )
+
+const sumApartmentsDataOfBuildingOfStreetOfDistrict = (
+  buildingName,
+  streetName,
+  districtName
+) =>
+  sumApartmentsData(
+    smartCity.districts
+      .find(x => x.name === districtName)
+      .streets.find(x => x.name === streetName)
+      .buildings.find(x => x.name === buildingName).apartments
+  )
+
+const dataOfApartmentOfBuildingOfStreetOfDistrict = (
+  apartmentName,
+  buildingName,
+  streetName,
+  districtName
+) =>
+  smartCity.districts
+    .find(x => x.name === districtName)
+    .streets.find(x => x.name === streetName)
+    .buildings.find(x => x.name === buildingName)
+    .apartments.find(x => x.name === apartmentName).data
+
 const SELECT_DISTRICT = "SELECT_DISTRICT"
 const SELECT_STREET = "SELECT_STREET"
 const SELECT_BUILDING = "SELECT_BUILDING"
@@ -180,7 +259,10 @@ const reducer = (state, action) => {
         district: action.payload,
         street: "",
         building: "",
-        apartment: ""
+        apartment: "",
+        data: action.payload
+          ? sumStreetsDataOfDistrict(action.payload)
+          : sumDistrictsData(smartCity.districts)
       }
     }
     case SELECT_STREET: {
@@ -188,20 +270,42 @@ const reducer = (state, action) => {
         ...state,
         street: action.payload,
         building: "",
-        apartment: ""
+        apartment: "",
+        data: action.payload
+          ? sumBuildingsDataOfStreetOfDistrict(action.payload, state.district)
+          : sumStreetsDataOfDistrict(state.district)
       }
     }
     case SELECT_BUILDING: {
       return {
         ...state,
         building: action.payload,
-        apartment: ""
+        apartment: "",
+        data: action.payload
+          ? sumApartmentsDataOfBuildingOfStreetOfDistrict(
+              action.payload,
+              state.street,
+              state.district
+            )
+          : sumBuildingsDataOfStreetOfDistrict(state.street, state.district)
       }
     }
     case SELECT_APARTMENT: {
       return {
         ...state,
-        apartment: action.payload
+        apartment: action.payload,
+        data: action.payload
+          ? dataOfApartmentOfBuildingOfStreetOfDistrict(
+              action.payload,
+              state.building,
+              state.street,
+              state.district
+            )
+          : sumApartmentsDataOfBuildingOfStreetOfDistrict(
+              state.building,
+              state.street,
+              state.district
+            )
       }
     }
     default: {
@@ -214,7 +318,8 @@ const initialState = {
   district: "",
   street: "",
   building: "",
-  apartment: ""
+  apartment: "",
+  data: sumDistrictsData(smartCity.districts)
 }
 
 const RSO = () => {
@@ -350,7 +455,11 @@ const RSO = () => {
             </FormGroup>
 
             <div className="py-3">
-              <Line data={mainChart} options={mainChartOpts} height={300} />
+              <Line
+                data={mainChartWithData(state.data)}
+                options={mainChartOpts}
+                height={300}
+              />
             </div>
           </CardBody>
         </Card>
