@@ -12,6 +12,7 @@ import {
 } from "reactstrap"
 import {getStyle, hexToRgba} from "@coreui/coreui/dist/js/coreui-utilities"
 import {CustomTooltips} from "@coreui/coreui-plugin-chartjs-custom-tooltips"
+import dayjs from "dayjs"
 
 const brandPrimary = getStyle("--primary")
 const brandSuccess = getStyle("--success")
@@ -20,48 +21,21 @@ const brandWarning = getStyle("--warning")
 const brandDanger = getStyle("--danger")
 
 // Random Numbers
-function random(min, max) {
-  return Math.floor(Math.random() * (max - min + 1) + min)
-}
+const random = (min, max) => Math.floor(Math.random() * (max - min + 1) + min)
 
-var elements = 27
-var data1 = []
+const length = 30
+const data = []
+const labels = []
 
-for (var i = 0; i <= elements; i++) {
-  data1.push(random(50, 200))
+const startDate = dayjs().startOf("year")
+
+for (let i = 0; i < length; i++) {
+  data.push(random(50, 200))
+  labels.push(startDate.add(i, "days").format("MMM DD"))
 }
 
 const mainChart = {
-  labels: [
-    "Mo",
-    "Tu",
-    "We",
-    "Th",
-    "Fr",
-    "Sa",
-    "Su",
-    "Mo",
-    "Tu",
-    "We",
-    "Th",
-    "Fr",
-    "Sa",
-    "Su",
-    "Mo",
-    "Tu",
-    "We",
-    "Th",
-    "Fr",
-    "Sa",
-    "Su",
-    "Mo",
-    "Tu",
-    "We",
-    "Th",
-    "Fr",
-    "Sa",
-    "Su"
-  ],
+  labels,
   datasets: [
     {
       label: "My First dataset",
@@ -69,7 +43,7 @@ const mainChart = {
       borderColor: brandInfo,
       pointHoverBackgroundColor: "#fff",
       borderWidth: 2,
-      data: data1
+      data
     }
   ]
 }
@@ -296,7 +270,7 @@ const RSO = () => {
               </Col>
             </FormGroup>
 
-            <div>
+            <div className="py-3">
               <Line data={mainChart} options={mainChartOpts} height={300} />
             </div>
           </CardBody>
