@@ -8,12 +8,12 @@ export default {
     {
       name: "РСО",
       url: "/rso",
-      icon: "icon-speedometer"
+      icon: "icon-pie-chart"
     },
     {
       name: "Мэр",
-      url: "/dashboard",
-      icon: "icon-speedometer"
+      url: "/mayor",
+      icon: "icon-star"
     },
     {
       name: "Dashboard",

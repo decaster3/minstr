@@ -1,8 +1,5 @@
 import React from "react";
 
-const Client = React.lazy(() => import("./views/Client"));
-const Rso = React.lazy(() => import("./views/Rso"));
-
 const Breadcrumbs = React.lazy(() => import("./views/Base/Breadcrumbs"));
 const Cards = React.lazy(() => import("./views/Base/Cards"));
 const Carousels = React.lazy(() => import("./views/Base/Carousels"));
@@ -42,12 +39,12 @@ const Typography = React.lazy(() => import("./views/Theme/Typography"));
 const Widgets = React.lazy(() => import("./views/Widgets/Widgets"));
 const Users = React.lazy(() => import("./views/Users/Users"));
 const User = React.lazy(() => import("./views/Users/User"));
+const Client = React.lazy(() => import("./views/Client"));
+const RSO = React.lazy(() => import("./views/RSO"));
+const Mayor = React.lazy(() => import("./views/Mayor"));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
-  { path: "/client", exact: true, name: "Client", component: Client },
-  { path: "/rso", exact: true, name: "Rso", component: Rso },
-
   { path: "/", exact: true, name: "Home" },
   { path: "/dashboard", name: "Dashboard", component: Dashboard },
   { path: "/theme", exact: true, name: "Theme", component: Colors },
@@ -109,7 +106,10 @@ const routes = [
   { path: "/widgets", name: "Widgets", component: Widgets },
   { path: "/charts", name: "Charts", component: Charts },
   { path: "/users", exact: true, name: "Users", component: Users },
-  { path: "/users/:id", exact: true, name: "User Details", component: User }
+  { path: "/users/:id", exact: true, name: "User Details", component: User },
+  { path: "/client", exact: true, name: "Клиент", component: Client },
+  { path: "/rso", exact: true, name: "РСО", component: RSO },
+  { path: "/mayor", exact: true, name: "Мэр", component: Mayor }
 ];
 
 export default routes;

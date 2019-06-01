@@ -1,10 +1,7 @@
-import React, { Component } from "react";
-import { HashRouter, Route, Switch } from "react-router-dom";
+import React from "react";
 
-class Client extends Component {
-  render() {
-    return <div>Clinet</div>;
-  }
-}
+const Client = () => {
+  return <div>Client</div>;
+};
 
 export default Client;
