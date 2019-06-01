@@ -1,6 +1,7 @@
 import {CustomTooltips} from "@coreui/coreui-plugin-chartjs-custom-tooltips"
 import {getStyle, hexToRgba} from "@coreui/coreui/dist/js/coreui-utilities"
 import dayjs from "dayjs"
+import * as R from "ramda"
 import React, {useReducer} from "react"
 import {Line} from "react-chartjs-2"
 import {
@@ -44,29 +45,61 @@ const generate = (delta, cnt, avg, drop, nProb, nMin, nMax) => {
   const createVal = () => {
     if (Math.random() > nProb) {
       return Math.floor(Math.random() * (nMax - nMin) + nMin)
+    } else {
+      return Math.floor(
+        Math.random() * drop * (Math.random() > 0.5 ? -1 : 1) + avg
+      )
     }
-    return Math.floor(
-      Math.random() * drop * (Math.random() > 0.5 ? -1 : 1) + avg
-    )
   }
   const rets = []
-  for (var i = 0; i < cnt; ++i) {
+  R.times(i => {
     rets.push(createVal())
     avg += delta
-  }
+  }, cnt)
   return rets
 }
 
 const length = 30
-const data = generate(1, length, 50, 10, 0.9, 0, 100)
-const labels = []
-
 const startDate = dayjs().startOf("year")
+const data = generate(0, length, 50, 10, 0.9, 0, 100)
+const labels = R.times(i => startDate.add(i, "day").format("MMM DD"), length)
 
-for (let i = 0; i < length; i++) {
-  // data.push(random(50, 200))
-  labels.push(startDate.add(i, "day").format("MMM DD"))
+const districtNames = R.times(i => `District ${i + 1}`, 13)
+const streetNames = R.times(i => `Street ${i + 1}`, 13)
+const buildingNames = R.times(i => `Building ${i + 1}`, 13)
+const apartmentNames = R.times(i => `Apartment ${i + 1}`, 13)
+
+const smartCity = {
+  name: "Smart City 1",
+  type: "city",
+  districts: districtNames.map(districtName => {
+    return {
+      name: districtName,
+      type: "district",
+      streets: streetNames.map(streetName => {
+        return {
+          name: streetName,
+          type: "street",
+          buildings: buildingNames.map(buildingName => {
+            return {
+              name: buildingName,
+              type: "building",
+              apartments: apartmentNames.map(apartmentName => {
+                return {
+                  type: "apartment",
+                  name: apartmentName,
+                  data: generate(0, length, 50, 10, 0.9, 0, 100)
+                }
+              })
+            }
+          })
+        }
+      })
+    }
+  })
 }
+
+console.log("smartCity", smartCity)
 
 const mainChart = {
   labels,
@@ -214,8 +247,10 @@ const RSO = () => {
                   <option value="" key="">
                     No district
                   </option>
-                  {[...new Array(13)].map((_, i) => (
-                    <option value={i} key={i}>{`District ${i + 1}`}</option>
+                  {districtNames.map(districtName => (
+                    <option value={districtName} key={districtName}>
+                      {districtName}
+                    </option>
                   ))}
                 </Input>
               </Col>
@@ -243,8 +278,10 @@ const RSO = () => {
                   <option value="" key="">
                     No street
                   </option>
-                  {[...new Array(13)].map((_, i) => (
-                    <option value={i} key={i}>{`Street ${i + 1}`}</option>
+                  {streetNames.map(streetName => (
+                    <option value={streetName} key={streetName}>
+                      {streetName}
+                    </option>
                   ))}
                 </Input>
               </Col>
@@ -272,8 +309,10 @@ const RSO = () => {
                   <option value="" key="">
                     No building
                   </option>
-                  {[...new Array(100)].map((_, i) => (
-                    <option value={i} key={i}>{`Building ${i + 1}`}</option>
+                  {buildingNames.map(buildingName => (
+                    <option value={buildingName} key={buildingName}>
+                      {buildingName}
+                    </option>
                   ))}
                 </Input>
               </Col>
@@ -301,8 +340,10 @@ const RSO = () => {
                   <option value="" key="">
                     No apartment
                   </option>
-                  {[...new Array(100)].map((_, i) => (
-                    <option value={i} key={i}>{`Apartment ${i + 1}`}</option>
+                  {apartmentNames.map(apartmentName => (
+                    <option value={apartmentName} key={apartmentName}>
+                      {apartmentName}
+                    </option>
                   ))}
                 </Input>
               </Col>

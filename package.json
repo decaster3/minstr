@@ -30,6 +30,7 @@
     "oo7-react": "^0.8.13",
     "oo7-substrate": "^0.8.0",
     "prop-types": "^15.7.2",
+    "ramda": "^0.26.1",
     "react": "^16.8.6",
     "react-app-polyfill": "^1.0.1",
     "react-chartjs-2": "^2.7.6",
