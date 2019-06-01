@@ -2,12 +2,12 @@ export default {
   items: [
     {
       name: "Клиент",
-      url: "/dashboard",
+      url: "/client",
       icon: "icon-speedometer"
     },
     {
       name: "РСО",
-      url: "/dashboard",
+      url: "/rso",
       icon: "icon-speedometer"
     },
     {

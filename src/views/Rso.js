@@ -1,10 +1,10 @@
 import React, { Component } from "react";
 import { HashRouter, Route, Switch } from "react-router-dom";
 
-class Client extends Component {
+class Rso extends Component {
   render() {
-    return <div>Clinet</div>;
+    return <div>Rso</div>;
   }
 }
 
-export default Client;
+export default Rso;
