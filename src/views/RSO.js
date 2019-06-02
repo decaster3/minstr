@@ -16,19 +16,13 @@ import {
 } from "reactstrap"
 import ipfsApi from "ipfs-api"
 
-const ipfs = ipfsApi("/ip4/127.0.0.1/tcp/5001")
+export const ipfs = ipfsApi("/ip4/127.0.0.1/tcp/5001")
 
-const brandPrimary = getStyle("--primary")
-const brandSuccess = getStyle("--success")
-const brandInfo = getStyle("--info")
-const brandWarning = getStyle("--warning")
-const brandDanger = getStyle("--danger")
-
-/**
- * @param {number} min
- * @param {number} max
- */
-const random = (min, max) => Math.floor(Math.random() * (max - min + 1) + min)
+export const brandPrimary = getStyle("--primary")
+export const brandSuccess = getStyle("--success")
+export const brandInfo = getStyle("--info")
+export const brandWarning = getStyle("--warning")
+export const brandDanger = getStyle("--danger")
 
 /**
  * Generates an array of smoothly random values

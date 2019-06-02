@@ -18,90 +18,15 @@ import {
   SELECT_DISTRICT,
   SELECT_STREET,
   SELECT_BUILDING,
-  SELECT_APARTMENT
+  SELECT_APARTMENT,
+  brandInfo,
+  brandSuccess,
+  ipfs
 } from "./RSO"
 import ipfsApi from "ipfs-api"
 import * as R from "ramda"
 
-const ipfs = ipfsApi("/ip4/127.0.0.1/tcp/5001")
-
-const IPFSData = [
-  {
-    id: "904",
-    name: "cer_kv_4_f_a0",
-    valueType: "DOUBLE",
-    value: {
-      doubleValue: 3809.0499999999383
-    },
-    visible: "RUNTIME",
-    access: "READ_ONLY",
-    displayName: "cer_kv_4_f_a0",
-    createdAt: "2019-03-11 12:55:33"
-  },
-  {
-    id: "905",
-    name: "cer_kv_4_f_a0",
-    valueType: "DOUBLE",
-    value: {
-      doubleValue: 2000
-    },
-    visible: "RUNTIME",
-    access: "READ_ONLY",
-    displayName: "cer_kv_4_f_a0",
-    createdAt: "2019-03-12 10:55:33"
-  },
-  {
-    id: "906",
-    name: "cer_kv_4_f_a0",
-    valueType: "DOUBLE",
-    value: {
-      doubleValue: 1000
-    },
-    visible: "RUNTIME",
-    access: "READ_ONLY",
-    displayName: "cer_kv_4_f_a0",
-    createdAt: "2019-03-13 10:55:33"
-  }
-]
-
-const brandPrimary = getStyle("--primary")
-const brandSuccess = getStyle("--success")
-const brandInfo = getStyle("--info")
-const brandWarning = getStyle("--warning")
-const brandDanger = getStyle("--danger")
-
-let data1 = []
-let data2 = []
-
-const summ = IPFSData.reduce((acc, cur) => acc + cur.value.doubleValue, 0)
-console.log(summ)
-IPFSData.forEach(el => {
-  data1.push(el.value.doubleValue)
-  data2.push(summ / IPFSData.length)
-})
 const cost = 5.47
-
-const mainChart = {
-  labels: IPFSData.map(day => dayjs(day.createdAt).format("M ddd")),
-  datasets: [
-    {
-      label: "My First dataset",
-      backgroundColor: hexToRgba(brandInfo, 10),
-      borderColor: brandInfo,
-      pointHoverBackgroundColor: "#fff",
-      borderWidth: 2,
-      data: data1
-    },
-    {
-      label: "My Second dataset",
-      backgroundColor: "transparent",
-      borderColor: brandSuccess,
-      pointHoverBackgroundColor: "#fff",
-      borderWidth: 2,
-      data: data2
-    }
-  ]
-}
 
 const length = 30
 const startDate = dayjs().startOf("year")
