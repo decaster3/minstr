@@ -18,8 +18,7 @@ import {
   SELECT_DISTRICT,
   SELECT_STREET,
   SELECT_BUILDING,
-  SELECT_APARTMENT,
-  mainChartWithData
+  SELECT_APARTMENT
 } from "./RSO"
 import ipfsApi from "ipfs-api"
 import * as R from "ramda"
@@ -102,6 +101,39 @@ const mainChart = {
       data: data2
     }
   ]
+}
+
+const length = 30
+const startDate = dayjs().startOf("year")
+// const data = generate(0, length, 50, 10, 0.9, 0, 100)
+const labels = R.times(i => startDate.add(i, "day").format("MMM DD"), length)
+
+/**
+ * @return {Chart.ChartData} data
+ */
+export const mainChartWithData = data => {
+  const avg = R.sum(data) / data.length
+  return {
+    labels,
+    datasets: [
+      {
+        label: "My First dataset",
+        backgroundColor: hexToRgba(brandInfo, 10),
+        borderColor: brandInfo,
+        pointHoverBackgroundColor: "#fff",
+        borderWidth: 2,
+        data
+      },
+      {
+        label: "My Second dataset",
+        backgroundColor: "transparent",
+        borderColor: brandSuccess,
+        pointHoverBackgroundColor: "#fff",
+        borderWidth: 2,
+        data: R.repeat(avg, data.length)
+      }
+    ]
+  }
 }
 
 /**
