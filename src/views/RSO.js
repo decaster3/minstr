@@ -121,7 +121,7 @@ const apartmentNames = R.times(i => `Apartment ${i + 1}`, 3)
 /**
  * @return {Chart.ChartData} data
  */
-const mainChartWithData = data => ({
+export const mainChartWithData = data => ({
   labels,
   datasets: [
     {
@@ -256,13 +256,14 @@ const dataOfApartmentOfBuildingOfStreetOfDistrict = (
     .buildings.find(x => x.name === buildingName)
     .apartments.find(x => x.name === apartmentName).data
 
-const SELECT_DISTRICT = "SELECT_DISTRICT"
-const SELECT_STREET = "SELECT_STREET"
-const SELECT_BUILDING = "SELECT_BUILDING"
-const SELECT_APARTMENT = "SELECT_APARTMENT"
-const SET_SMART_CITY = "SET_SMART_CITY"
+export const SELECT_DISTRICT = "SELECT_DISTRICT"
+export const SELECT_STREET = "SELECT_STREET"
+export const SELECT_BUILDING = "SELECT_BUILDING"
+export const SELECT_APARTMENT = "SELECT_APARTMENT"
+export const SET_SMART_CITY = "SET_SMART_CITY"
+export const INIT = "INIT"
 
-const reducer = (state, action) => {
+export const reducer = (state, action) => {
   switch (action.type) {
     case SET_SMART_CITY: {
       return {
@@ -348,7 +349,8 @@ const initialState = {
   street: "",
   building: "",
   apartment: "",
-  data: undefined
+  data: undefined,
+  smartCity: undefined
 }
 
 const RSO = () => {
