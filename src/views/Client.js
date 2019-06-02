@@ -155,10 +155,24 @@ const Client = () => {
         !state.building ||
         !state.apartment
       ) {
-        dispatch({type: SELECT_DISTRICT, payload: "District 1"})
-        dispatch({type: SELECT_STREET, payload: "Street 1"})
-        dispatch({type: SELECT_BUILDING, payload: "Building 1"})
-        dispatch({type: SELECT_APARTMENT, payload: "Apartment 1"})
+        dispatch({
+          type: SELECT_DISTRICT,
+          payload: state.smartCity.districts[0].name
+        })
+        dispatch({
+          type: SELECT_STREET,
+          payload: state.smartCity.districts[0].streets[0].name
+        })
+        dispatch({
+          type: SELECT_BUILDING,
+          payload: state.smartCity.districts[0].streets[0].buildings[0].name
+        })
+        dispatch({
+          type: SELECT_APARTMENT,
+          payload:
+            state.smartCity.districts[0].streets[0].buildings[0].apartments[0]
+              .name
+        })
       }
     }
   })

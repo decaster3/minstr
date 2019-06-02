@@ -16,6 +16,8 @@ import {
 } from "reactstrap"
 import ipfsApi from "ipfs-api"
 import "dayjs/locale/ru" // load on demand
+import {ApiPromise, WsProvider} from "@polkadot/api"
+import {Keyring} from "@polkadot/keyring"
 
 dayjs.locale("ru") // use Spanish locale globally
 
@@ -64,10 +66,10 @@ const startDate = dayjs().startOf("year")
 // const data = generate(0, length, 50, 10, 0.9, 0, 100)
 const labels = R.times(i => startDate.add(i, "day").format("MMM DD"), length)
 
-const districtNames = R.times(i => `District ${i + 1}`, 13)
-const streetNames = R.times(i => `Street ${i + 1}`, 8)
-const buildingNames = R.times(i => `Building ${i + 1}`, 5)
-const apartmentNames = R.times(i => `Apartment ${i + 1}`, 3)
+// const districtNames = R.times(i => `District ${i + 1}`, 13)
+// const streetNames = R.times(i => `Street ${i + 1}`, 8)
+// const buildingNames = R.times(i => `Building ${i + 1}`, 5)
+// const apartmentNames = R.times(i => `Apartment ${i + 1}`, 3)
 
 // const smartCity = {
 //   name: "Smart City 1",
@@ -260,6 +262,24 @@ export const SELECT_APARTMENT = "SELECT_APARTMENT"
 export const SET_SMART_CITY = "SET_SMART_CITY"
 export const INIT = "INIT"
 
+const getHash = async () => {
+  const provider = new WsProvider("ws://127.0.0.1:9944")
+  const api = await ApiPromise.create(provider)
+  const keyring = new Keyring({type: "sr25519"})
+  const alice = keyring.addFromUri("//Alice")
+  const count = await api.query.robonomics.sensorCount()
+  const lastHash = await api.query.robonomics.sensorOf(count)
+  return lastHash
+}
+
+getHash()
+  .then(result => {
+    console.log("result", result)
+  })
+  .catch(error => {
+    console.log("error", error)
+  })
+
 export const reducer = (state, action) => {
   switch (action.type) {
     case SET_SMART_CITY: {
@@ -370,6 +390,21 @@ const RSO = () => {
       )
     }
   })
+
+  const districtNames = state.smartCity
+    ? state.smartCity.districts.map(R.prop("name"))
+    : []
+  const streetNames = state.smartCity
+    ? state.smartCity.districts[0].streets.map(R.prop("name"))
+    : []
+  const buildingNames = state.smartCity
+    ? state.smartCity.districts[0].streets[0].buildings.map(R.prop("name"))
+    : []
+  const apartmentNames = state.smartCity
+    ? state.smartCity.districts[0].streets[0].buildings[0].apartments.map(
+        R.prop("name")
+      )
+    : []
 
   return (
     <Row>
