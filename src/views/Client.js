@@ -1,7 +1,9 @@
 import {CustomTooltips} from "@coreui/coreui-plugin-chartjs-custom-tooltips"
-import {getStyle, hexToRgba} from "@coreui/coreui/dist/js/coreui-utilities"
+import {hexToRgba} from "@coreui/coreui/dist/js/coreui-utilities"
 import dayjs from "dayjs"
-import React, {useReducer, useEffect} from "react"
+import "dayjs/locale/ru" // load on demand
+import * as R from "ramda"
+import React, {useEffect, useReducer} from "react"
 import {Line} from "react-chartjs-2"
 import {
   Button,
@@ -13,18 +15,18 @@ import {
   Row
 } from "reactstrap"
 import {
-  reducer,
-  SET_SMART_CITY,
-  SELECT_DISTRICT,
-  SELECT_STREET,
-  SELECT_BUILDING,
-  SELECT_APARTMENT,
   brandInfo,
   brandSuccess,
-  ipfs
+  ipfs,
+  reducer,
+  SELECT_APARTMENT,
+  SELECT_BUILDING,
+  SELECT_DISTRICT,
+  SELECT_STREET,
+  SET_SMART_CITY
 } from "./RSO"
-import ipfsApi from "ipfs-api"
-import * as R from "ramda"
+
+dayjs.locale("ru") // use Spanish locale globally
 
 const cost = 5.47
 

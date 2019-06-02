@@ -15,6 +15,9 @@ import {
   Row
 } from "reactstrap"
 import ipfsApi from "ipfs-api"
+import "dayjs/locale/ru" // load on demand
+
+dayjs.locale("ru") // use Spanish locale globally
 
 export const ipfs = ipfsApi("/ip4/127.0.0.1/tcp/5001")
 
