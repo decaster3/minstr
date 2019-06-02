@@ -2,7 +2,7 @@ import {CustomTooltips} from "@coreui/coreui-plugin-chartjs-custom-tooltips"
 import {getStyle, hexToRgba} from "@coreui/coreui/dist/js/coreui-utilities"
 import dayjs from "dayjs"
 import * as R from "ramda"
-import React, {useReducer} from "react"
+import React, {useReducer, useEffect, useRef} from "react"
 import {Line} from "react-chartjs-2"
 import {
   Card,
@@ -14,6 +14,9 @@ import {
   Label,
   Row
 } from "reactstrap"
+import ipfsApi from "ipfs-api"
+
+const ipfs = ipfsApi("/ip4/127.0.0.1/tcp/5001")
 
 const brandPrimary = getStyle("--primary")
 const brandSuccess = getStyle("--success")
@@ -61,59 +64,59 @@ const generate = (delta, cnt, avg, drop, nProb, nMin, nMax) => {
 
 const length = 30
 const startDate = dayjs().startOf("year")
-const data = generate(0, length, 50, 10, 0.9, 0, 100)
+// const data = generate(0, length, 50, 10, 0.9, 0, 100)
 const labels = R.times(i => startDate.add(i, "day").format("MMM DD"), length)
 
 const districtNames = R.times(i => `District ${i + 1}`, 13)
-const streetNames = R.times(i => `Street ${i + 1}`, 13)
-const buildingNames = R.times(i => `Building ${i + 1}`, 13)
-const apartmentNames = R.times(i => `Apartment ${i + 1}`, 13)
+const streetNames = R.times(i => `Street ${i + 1}`, 8)
+const buildingNames = R.times(i => `Building ${i + 1}`, 5)
+const apartmentNames = R.times(i => `Apartment ${i + 1}`, 3)
 
-const smartCity = {
-  name: "Smart City 1",
-  type: "city",
-  districts: districtNames.map(districtName => {
-    return {
-      name: districtName,
-      type: "district",
-      streets: streetNames.map(streetName => {
-        return {
-          name: streetName,
-          type: "street",
-          buildings: buildingNames.map(buildingName => {
-            return {
-              name: buildingName,
-              type: "building",
-              apartments: apartmentNames.map(apartmentName => {
-                return {
-                  type: "apartment",
-                  name: apartmentName,
-                  data: generate(0, length, 50, 10, 0.9, 0, 100)
-                }
-              })
-            }
-          })
-        }
-      })
-    }
-  })
-}
+// const smartCity = {
+//   name: "Smart City 1",
+//   type: "city",
+//   districts: districtNames.map(districtName => {
+//     return {
+//       name: districtName,
+//       type: "district",
+//       streets: streetNames.map(streetName => {
+//         return {
+//           name: streetName,
+//           type: "street",
+//           buildings: buildingNames.map(buildingName => {
+//             return {
+//               name: buildingName,
+//               type: "building",
+//               apartments: apartmentNames.map(apartmentName => {
+//                 return {
+//                   type: "apartment",
+//                   name: apartmentName,
+//                   data: generate(0, length, 50, 10, 0.9, 0, 100)
+//                 }
+//               })
+//             }
+//           })
+//         }
+//       })
+//     }
+//   })
+// }
 
-console.log("smartCity", smartCity)
+// console.log("smartCity", JSON.stringify(smartCity))
 
-const mainChart = {
-  labels,
-  datasets: [
-    {
-      label: "My First dataset",
-      backgroundColor: hexToRgba(brandInfo, 10),
-      borderColor: brandInfo,
-      pointHoverBackgroundColor: "#fff",
-      borderWidth: 2,
-      data
-    }
-  ]
-}
+// const mainChart = {
+//   labels,
+//   datasets: [
+//     {
+//       label: "My First dataset",
+//       backgroundColor: hexToRgba(brandInfo, 10),
+//       borderColor: brandInfo,
+//       pointHoverBackgroundColor: "#fff",
+//       borderWidth: 2,
+//       data
+//     }
+//   ]
+// }
 
 /**
  * @return {Chart.ChartData} data
@@ -213,10 +216,14 @@ const sumDistrictsData = districts => {
   return zipSum(...districtDatas)
 }
 
-const sumStreetsDataOfDistrict = districtName =>
+const sumStreetsDataOfDistrict = (smartCity, districtName) =>
   sumStreetsData(smartCity.districts.find(x => x.name === districtName).streets)
 
-const sumBuildingsDataOfStreetOfDistrict = (streetName, districtName) =>
+const sumBuildingsDataOfStreetOfDistrict = (
+  smartCity,
+  streetName,
+  districtName
+) =>
   sumBuildingsData(
     smartCity.districts
       .find(x => x.name === districtName)
@@ -224,6 +231,7 @@ const sumBuildingsDataOfStreetOfDistrict = (streetName, districtName) =>
   )
 
 const sumApartmentsDataOfBuildingOfStreetOfDistrict = (
+  smartCity,
   buildingName,
   streetName,
   districtName
@@ -236,6 +244,7 @@ const sumApartmentsDataOfBuildingOfStreetOfDistrict = (
   )
 
 const dataOfApartmentOfBuildingOfStreetOfDistrict = (
+  smartCity,
   apartmentName,
   buildingName,
   streetName,
@@ -251,18 +260,27 @@ const SELECT_DISTRICT = "SELECT_DISTRICT"
 const SELECT_STREET = "SELECT_STREET"
 const SELECT_BUILDING = "SELECT_BUILDING"
 const SELECT_APARTMENT = "SELECT_APARTMENT"
+const SET_SMART_CITY = "SET_SMART_CITY"
 
 const reducer = (state, action) => {
   switch (action.type) {
+    case SET_SMART_CITY: {
+      return {
+        ...state,
+        smartCity: action.payload,
+        data: sumDistrictsData(action.payload.districts)
+      }
+    }
     case SELECT_DISTRICT: {
       return {
+        ...state,
         district: action.payload,
         street: "",
         building: "",
         apartment: "",
         data: action.payload
-          ? sumStreetsDataOfDistrict(action.payload)
-          : sumDistrictsData(smartCity.districts)
+          ? sumStreetsDataOfDistrict(state.smartCity, action.payload)
+          : sumDistrictsData(state.smartCity.districts)
       }
     }
     case SELECT_STREET: {
@@ -272,8 +290,12 @@ const reducer = (state, action) => {
         building: "",
         apartment: "",
         data: action.payload
-          ? sumBuildingsDataOfStreetOfDistrict(action.payload, state.district)
-          : sumStreetsDataOfDistrict(state.district)
+          ? sumBuildingsDataOfStreetOfDistrict(
+              state.smartCity,
+              action.payload,
+              state.district
+            )
+          : sumStreetsDataOfDistrict(state.smartCity, state.district)
       }
     }
     case SELECT_BUILDING: {
@@ -283,11 +305,16 @@ const reducer = (state, action) => {
         apartment: "",
         data: action.payload
           ? sumApartmentsDataOfBuildingOfStreetOfDistrict(
+              state.smartCity,
               action.payload,
               state.street,
               state.district
             )
-          : sumBuildingsDataOfStreetOfDistrict(state.street, state.district)
+          : sumBuildingsDataOfStreetOfDistrict(
+              state.smartCity,
+              state.street,
+              state.district
+            )
       }
     }
     case SELECT_APARTMENT: {
@@ -296,12 +323,14 @@ const reducer = (state, action) => {
         apartment: action.payload,
         data: action.payload
           ? dataOfApartmentOfBuildingOfStreetOfDistrict(
+              state.smartCity,
               action.payload,
               state.building,
               state.street,
               state.district
             )
           : sumApartmentsDataOfBuildingOfStreetOfDistrict(
+              state.smartCity,
               state.building,
               state.street,
               state.district
@@ -319,11 +348,30 @@ const initialState = {
   street: "",
   building: "",
   apartment: "",
-  data: sumDistrictsData(smartCity.districts)
+  data: undefined
 }
 
 const RSO = () => {
   const [state, dispatch] = useReducer(reducer, initialState)
+
+  useEffect(() => {
+    if (!state.smartCity) {
+      ipfs.files.get(
+        "QmS2WuHc1ctYa3KaZZ6giovsjsb7FSJ84ZRGHZAv71T2bj",
+        (err, files) => {
+          if (files) {
+            files.forEach(file => {
+              dispatch({
+                type: SET_SMART_CITY,
+                payload: JSON.parse(file.content.toString("utf8"))
+              })
+            })
+          }
+        }
+      )
+    }
+  })
+
   return (
     <Row>
       <Col>
@@ -454,13 +502,15 @@ const RSO = () => {
               </Col>
             </FormGroup>
 
-            <div className="py-3">
-              <Line
-                data={mainChartWithData(state.data)}
-                options={mainChartOpts}
-                height={300}
-              />
-            </div>
+            {state.data && (
+              <div className="py-3">
+                <Line
+                  data={mainChartWithData(state.data)}
+                  options={mainChartOpts}
+                  height={300}
+                />
+              </div>
+            )}
           </CardBody>
         </Card>
       </Col>
